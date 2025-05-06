@@ -1,15 +1,17 @@
-import { cn } from "@/lib/utils"
+// components/ui/skeleton.tsx
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-function Skeleton({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+export function Skeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-muted", className)}
-      {...props}
-    />
-  )
+      className={cn(
+        'bg-muted relative overflow-hidden rounded-md',
+        'animate-pulse',
+        className
+      )}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+    </div>
+  );
 }
-
-export { Skeleton }

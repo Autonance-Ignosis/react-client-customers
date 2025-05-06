@@ -121,3 +121,15 @@
 .content-area {
   @apply p-4 md:p-6 pt-20 lg:pt-20;
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+  background-size: 200% 100%;
+  transform: translateX(-100%);
+}

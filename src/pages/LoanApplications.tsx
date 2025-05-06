@@ -112,8 +112,8 @@ const LoanApplicationsPage = () => {
         }
     };
 
-    const viewApplicationDetails = (id: number) => {
-        navigate(`/loans/apply/${id}`);
+    const ApplyMandent = (id: number) => {
+        navigate(`/mandate/${id}`);
     };
 
     if (loading) {
@@ -190,7 +190,7 @@ const LoanApplicationsPage = () => {
                                 <CardFooter className="bg-muted/10 pt-3">
                                     <Button
                                         variant="outline"
-                                        onClick={() => viewApplicationDetails(application.loanOfferId)}
+                                        onClick={() => ApplyMandent(application.loanOfferId)}
                                         className="w-full"
                                     >
                                         View Details
@@ -214,7 +214,7 @@ const LoanApplicationsPage = () => {
                                         <TableHead>Interest Rate</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Approval Posibility</TableHead>
-                                        <TableHead className="text-right">Action</TableHead>
+                                        <TableHead className="text-right">Apply Mandent</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -235,9 +235,9 @@ const LoanApplicationsPage = () => {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    onClick={() => viewApplicationDetails(application.loanOfferId)}
+                                                    onClick={() => ApplyMandent(application.id)}
                                                 >
-                                                    View
+                                                    Apply
                                                 </Button>
                                             </TableCell>
                                         </TableRow>

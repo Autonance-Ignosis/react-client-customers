@@ -23,6 +23,7 @@ import NotFound from "@/pages/NotFound";
 import { useDispatch, useSelector } from "react-redux";
 import LoanOffers from "./pages/LoanOffers";
 import LoanApplicationsPage from "./pages/LoanApplications";
+import MandateApplication from "./pages/MandateApplication";
 
 const queryClient = new QueryClient();
 
@@ -136,11 +137,22 @@ const App = () => {
                   </RequireKyc>
                 } />
 
-                <Route path="/mandate" element={
+                <Route path="/mandate/:id" element={
                   <RequireKyc>
                     <MandateSetup />
                   </RequireKyc>
                 } />
+
+
+                <Route
+                  path="/mandate/apply/:bankId/:loanId"
+                  element={
+                    <RequireKyc>
+                      <MandateApplication />
+                    </RequireKyc>
+                  }
+                />
+
 
                 <Route path="/notifications" element={
                   <RequireKyc>
