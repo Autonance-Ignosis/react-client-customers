@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as Sonner, toast } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { useEffect } from "react";
@@ -63,10 +63,26 @@ const RequireKyc = ({ children }) => {
 const App = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.user) || {};
+  const userId = user?.id;
 
   useEffect(() => {
+
     loadUser();
   }, []);
+
+  useEffect(() => {
+    const socket = new WebSocket(`ws://localhost:8088/ws/notifications?userId=${userId}`);
+
+    socket.onmessage = (event) => {
+      const message = event.data;
+      console.log("Received message:", message);
+      toast.success(message);
+    };
+
+    return () => socket.close();
+  }, [userId]);
+
+
 
   const loadUser = async () => {
     try {
