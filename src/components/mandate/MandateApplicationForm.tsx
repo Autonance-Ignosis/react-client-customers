@@ -12,12 +12,12 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Search, CreditCard, Phone, Mail } from "lucide-react";
+import { Search, CreditCard } from "lucide-react";
 import { ProgressSteps } from "@/components/ui-custom/ProgressSteps";
 import axios from "axios";
-import { DatePicker } from "../ui-custom/Date-Picker";
+import { DatePicker } from "@/components/ui-custom/Date-Picker";
 import { useSelector } from "react-redux";
-import { Bank } from "@/types/loan";
+import { Mandate } from "@/types/Mandate";
 
 interface MandateApplicationFormProps {
   bankId: string;
@@ -31,8 +31,7 @@ interface MandateApplicationFormProps {
 const steps = [
   { id: 0, name: "Credit Details", description: "Credit account information" },
   { id: 1, name: "Mandate Details", description: "E-mandate specifics" },
-  { id: 2, name: "Debit Details", description: "Debit account information" },
-  { id: 3, name: "Contact Details", description: "Communication details" },
+  { id: 2, name: "Contact Details", description: "Communication details" },
 ];
 
 export default function MandateApplicationForm({
@@ -48,7 +47,7 @@ export default function MandateApplicationForm({
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [upTo40Years, setUpTo40Years] = useState(false);
-  
+  const user = useSelector((state: any) => state.user);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -67,14 +66,6 @@ export default function MandateApplicationForm({
     uptoDate: "",
     upTo40Years: false,
     consRefNo: "",
-
-    // Debit Card Details
-    accountNo: "",
-    accountName: "",
-    accountType: "",
-    ifscCode: "",
-    panNo: "",
-    destBank: "",
 
     // Contact Details
     phoneNo: "",
@@ -98,64 +89,102 @@ export default function MandateApplicationForm({
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
+    if (name === "upTo40Years") {
+      setUpTo40Years(checked);
 
-    // Handle special case for 40 years checkbox
-    if (name === "upTo40Years" && checked) {
-      // Calculate 40 years from today
-      const today = new Date();
-      const futureDate = new Date();
-      futureDate.setFullYear(today.getFullYear() + 40);
+      // Calculate 40 years from today if checked
+      if (checked) {
+        const today = new Date();
+        const futureDate = new Date();
+        futureDate.setFullYear(today.getFullYear() + 40);
+        setEndDate(futureDate);
+        setFormData((prev) => ({
+          ...prev,
+          uptoDate: futureDate.toISOString().split("T")[0],
+          upTo40Years: checked,
+        }));
+      } else {
+        setEndDate(undefined);
+        setFormData((prev) => ({
+          ...prev,
+          uptoDate: "",
+          upTo40Years: checked,
+        }));
+      }
+    } else {
       setFormData((prev) => ({
         ...prev,
-        uptoDate: futureDate.toISOString().split("T")[0],
+        [name]: checked,
       }));
     }
   };
 
-  const user = useSelector((state: any) => state.user);
-  console.log("User from Redux:", user);
+  // Fetch bank account and bank details
+  useEffect(() => {
+    setIsLoading(true);
+
+    // Fetch bank account details
+    if (user && user.user && user.user.id) {
+      axios
+        .get(
+          `http://localhost:8080/api/bank-accounts/${bankId}/${user.user.id}`
+        )
+        .then((res) => {
+          if (res.data && res.data.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              creditAccountNo: res.data[0].accountNo || "",
+              mobileNo: user.user.phone || "",
+              emailId: user.user.email || "",
+            }));
+            console.log("Fetched bank account:", res.data);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch bank account:", err);
+          toast.error("Failed to load bank account details");
+        });
+
+      // Fetch bank details
+      axios
+        .get(`http://localhost:8080/api/banks/id/${bankId}`)
+        .then((res) => {
+          console.log("Fetched bank:", res.data);
+          if (res.data) {
+            setFormData((prev) => ({
+              ...prev,
+              creditAccountName: res.data.name || "",
+              creditIfscCode: res.data.ifsc || "",
+            }));
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch bank:", err);
+          toast.error("Failed to load bank details");
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
+  }, [bankId, user]);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8083/api/bank-accounts/${bankId}/${user.user.id}`)
-      .then((res) => {
-        setFormData((prev) => ({
-          ...prev,
-          creditAccountNo: res.data[0].accountNo,
-        }));
-        console.log("Fetched bank account:", res.data);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch bank account:", err);
-      })
-      .finally(() => setIsLoading(false));
+    // Update form data when start date changes
+    if (startDate) {
+      setFormData((prev) => ({
+        ...prev,
+        startDate: startDate.toISOString().split("T")[0],
+      }));
+    }
 
-    axios
-      .get(`http://localhost:8083/api/banks/id/${bankId}`)
-      .then((res) => {
-        console.log("Fetched bank:", res.data);
-
-        if (res.data) {
-          setFormData((prev) => ({
-            ...prev,
-            creditAccountName: res.data.name,
-            creditIfscCode: res.data.ifsc,
-          }));
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch bank:", err);
-      });
-
-           
-
-  }, [bankId, user.user.id]); 
-
-
+    // Update form data when end date changes
+    if (endDate) {
+      setFormData((prev) => ({
+        ...prev,
+        uptoDate: endDate.toISOString().split("T")[0],
+      }));
+    }
+  }, [startDate, endDate]);
 
   const nextStep = () => {
     // Validate current step
@@ -165,6 +194,7 @@ export default function MandateApplicationForm({
 
     if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex((prev) => prev + 1);
+      window.scrollTo(0, 0); // Scroll to top when changing steps
     } else {
       handleSubmit();
     }
@@ -173,6 +203,7 @@ export default function MandateApplicationForm({
   const prevStep = () => {
     if (currentStepIndex > 0) {
       setCurrentStepIndex((prev) => prev - 1);
+      window.scrollTo(0, 0); // Scroll to top when changing steps
     }
   };
 
@@ -184,7 +215,7 @@ export default function MandateApplicationForm({
           !formData.creditAccountName ||
           !formData.creditIfscCode
         ) {
-          toast.error("Please fill all credit card details");
+          toast.error("Please fill all credit account details");
           return false;
         }
         break;
@@ -193,30 +224,18 @@ export default function MandateApplicationForm({
           !formData.category ||
           !formData.debitType ||
           !formData.schemaName ||
-          !formData.startDate
+          !formData.amount ||
+          !formData.startDate ||
+          (!formData.uptoDate && !upTo40Years) ||
+          !formData.consRefNo
         ) {
           toast.error("Please fill all mandate details");
           return false;
         }
         break;
-      case 2: // Debit Card Details
-        if (
-          !formData.accountNo ||
-          !formData.accountName ||
-          !formData.accountType ||
-          !formData.ifscCode
-        ) {
-          toast.error("Please fill all debit card details");
-          return false;
-        }
-        break;
-      case 3: // Contact Details
-        if (!formData.mobileNo || !formData.emailId) {
-          toast.error("Please fill all required contact details");
-          return false;
-        }
-        if (!validateEmail(formData.emailId)) {
-          toast.error("Please enter a valid email address");
+      case 2: // Contact Details
+        if (!agreeToTerms) {
+          toast.error("Please agree to the terms and conditions");
           return false;
         }
         break;
@@ -225,18 +244,17 @@ export default function MandateApplicationForm({
   };
 
   const validateEmail = (email: string) => {
-    // Basic email validation
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
   const handleSubmit = async () => {
+    if (!validateCurrentStep()) {
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate API call
 
-    setIsLoading(false);
-    console.log("Form submitted:", formData);
-
-    const payload = {
+    const mandatePayload: Mandate = {
       loanId: loanId,
       userId: user.user.id,
       bankAccountId: bankId,
@@ -247,51 +265,50 @@ export default function MandateApplicationForm({
       freqType: "MONTHLY",
       schemaName: formData.schemaName,
       consRefNo: formData.consRefNo,
-      amount: formData.amount,
+      amount: Number(formData.amount),
       startDate: formData.startDate,
       uptoDate: formData.uptoDate,
       upTo40Years: formData.upTo40Years,
-      debitAccountNumber: formData.accountNo,
-      debitAccountName: formData.accountName,
-      accountType: formData.accountType,
-      debitIfscCode: formData.ifscCode,
-      panNumber: formData.panNo,
-      destinationBank: formData.destBank,
-      phoneNo: formData.phoneNo,
-      mobileNo: formData.mobileNo,
-      emailId: formData.emailId,
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:8085/api/mandates",
-        payload
+        "http://localhost:8080/api/mandates",
+        mandatePayload
       );
       console.log("Mandate submitted:", response.data);
+      toast.success("Mandate application submitted successfully");
+      onConfirm();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
           "Mandate submission failed:",
           error.response?.data || error.message
         );
+        toast.error(
+          `Submission failed: ${
+            error.response?.data?.message || "Please try again later"
+          }`
+        );
       } else {
         console.error("Unknown error:", error);
+        toast.error("An unexpected error occurred");
       }
+    } finally {
+      setIsLoading(false);
     }
-
-    onConfirm();
   };
-  
-  
 
   // Render Credit Card Details Step
   const renderCreditCardDetailsStep = () => {
-    
     return (
-        
       <div className="space-y-6">
-        <h3 className="text-lg font-medium">Credit Account Detail (Sponsor)</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex items-center gap-2 mb-4">
+          <CreditCard className="h-6 w-6 text-primary" />
+          <h3 className="text-lg font-medium">Credit Account Details</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="creditAccountNo" className="flex">
               Credit A/c No. <span className="text-red-500 ml-1">*</span>
@@ -338,7 +355,6 @@ export default function MandateApplicationForm({
               id="creditIfscCode"
               name="creditIfscCode"
               value={formData.creditIfscCode}
-              onChange={handleInputChange}
               placeholder="Enter Credit IFSC Code"
               disabled={true}
             />
@@ -352,9 +368,12 @@ export default function MandateApplicationForm({
   const renderMandateDetailsStep = () => {
     return (
       <div className="space-y-6">
-        <h3 className="text-lg font-medium">Mandate Details</h3>
+        <div className="flex items-center gap-2 mb-4">
+          <CreditCard className="h-6 w-6 text-primary" />
+          <h3 className="text-lg font-medium">Mandate Details</h3>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="mandateVariant" className="flex">
               Mandate Variant <span className="text-red-500 ml-1">*</span>
@@ -364,6 +383,7 @@ export default function MandateApplicationForm({
               onValueChange={(value) =>
                 handleSelectChange("mandateVariant", value)
               }
+              disabled={true}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select Mandate Variant" />
@@ -381,6 +401,7 @@ export default function MandateApplicationForm({
               Category <span className="text-red-500 ml-1">*</span>
             </Label>
             <Select
+              value={formData.category}
               onValueChange={(value) =>
                 setFormData((prev) => ({ ...prev, category: value }))
               }
@@ -445,7 +466,7 @@ export default function MandateApplicationForm({
 
           <div className="space-y-2">
             <Label htmlFor="amount" className="flex">
-              Amount <span className="text-red-500 ml-1">*</span>
+              Amount (₹) <span className="text-red-500 ml-1">*</span>
             </Label>
             <Input
               id="amount"
@@ -454,6 +475,19 @@ export default function MandateApplicationForm({
               value={formData.amount}
               onChange={handleInputChange}
               placeholder="Enter Amount"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="consRefNo" className="flex">
+              Consumer Ref. No. <span className="text-red-500 ml-1">*</span>
+            </Label>
+            <Input
+              id="consRefNo"
+              name="consRefNo"
+              value={formData.consRefNo}
+              onChange={handleInputChange}
+              placeholder="Enter Reference Number"
             />
           </div>
 
@@ -497,139 +531,6 @@ export default function MandateApplicationForm({
               </div>
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="consRefNo" className="flex">
-              Cons. Ref. No. <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="consRefNo"
-              name="consRefNo"
-              value={formData.consRefNo}
-              onChange={handleInputChange}
-              placeholder="Enter Reference Number"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Render Debit Card Details Step
-  const renderDebitCardDetailsStep = () => {
-    return (
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium">
-          Debit Account Detail (Destination)
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="accountNo" className="flex">
-              A/c No. <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="accountNo"
-              name="accountNo"
-              value={formData.accountNo}
-              onChange={handleInputChange}
-              placeholder="Enter Account Number"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="accountName" className="flex">
-              Account Name <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="accountName"
-              name="accountName"
-              value={formData.accountName}
-              onChange={handleInputChange}
-              placeholder="Enter Account Name"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="accountType" className="flex">
-              A/c Type <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Select
-              onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, accountType: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="-Select-" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="SAVINGS">Savings</SelectItem>
-                <SelectItem value="CURRENT">Current</SelectItem>
-                <SelectItem value="OTHERS">Others</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="ifscCode" className="flex">
-              IFSC Code <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="ifscCode"
-              name="ifscCode"
-              value={formData.ifscCode}
-              onChange={handleInputChange}
-              placeholder="Enter IFSC Code"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="panNo" className="flex">
-              PAN No. <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="panNo"
-              name="panNo"
-              value={formData.panNo}
-              onChange={handleInputChange}
-              placeholder="Enter PAN Number"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="destBank" className="flex">
-              Dest. Bank <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Select
-              onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, destBank: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Destination Bank" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="STATE_BANK_OF_INDIA">
-                  State Bank of India
-                </SelectItem>
-                <SelectItem value="HDFC_BANK">HDFC Bank</SelectItem>
-                <SelectItem value="ICICI_BANK">ICICI Bank</SelectItem>
-                <SelectItem value="AXIS_BANK">Axis Bank</SelectItem>
-                <SelectItem value="PUNJAB_NATIONAL_BANK">
-                  Punjab National Bank
-                </SelectItem>
-                <SelectItem value="KOTAK_MAHINDRA_BANK">
-                  Kotak Mahindra Bank
-                </SelectItem>
-                <SelectItem value="BANK_OF_BARODA">Bank of Baroda</SelectItem>
-                <SelectItem value="YES_BANK">Yes Bank</SelectItem>
-                <SelectItem value="CANARA_BANK">Canara Bank</SelectItem>
-                <SelectItem value="UNION_BANK_OF_INDIA">
-                  Union Bank of India
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       </div>
     );
@@ -639,10 +540,13 @@ export default function MandateApplicationForm({
   const renderContactDetailsStep = () => {
     return (
       <div className="space-y-6">
-        <h3 className="text-lg font-medium">Contact Detail</h3>
+        <div className="flex items-center gap-2 mb-4">
+          <CreditCard className="h-6 w-6 text-primary" />
+          {/* <h3 className="text-lg font-medium">Contact Details</h3> */}
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* <div className="space-y-2">
             <Label htmlFor="phoneNo">Phone No.</Label>
             <Input
               id="phoneNo"
@@ -677,18 +581,23 @@ export default function MandateApplicationForm({
               onChange={handleInputChange}
               placeholder="Enter Email Address"
             />
-          </div>
+          </div> */}
 
-          <div className="md:col-span-2 mt-4">
-            <div className="flex items-center space-x-2">
+          <div className="md:col-span-2 mt-4 p-4 bg-muted/30 rounded-lg border">
+            <div className="flex items-start space-x-3">
               <Checkbox
                 id="agreeToTerms"
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
+                className="mt-1"
               />
               <Label htmlFor="agreeToTerms" className="text-sm">
                 I authorize the bank to debit my account as per the mandate
                 instructions. I have read and agree to the terms and conditions.
+                I understand that this authorization will remain in effect until
+                I cancel it in writing, and I agree to notify the bank of any
+                changes in my account information or termination of this
+                authorization at least 15 days prior to the next billing date.
               </Label>
             </div>
           </div>
@@ -705,8 +614,6 @@ export default function MandateApplicationForm({
       case 1:
         return renderMandateDetailsStep();
       case 2:
-        return renderDebitCardDetailsStep();
-      case 3:
         return renderContactDetailsStep();
       default:
         return null;
@@ -714,7 +621,7 @@ export default function MandateApplicationForm({
   };
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 shadow-md">
       <ProgressSteps
         steps={steps}
         currentStep={currentStepIndex}
@@ -735,16 +642,19 @@ export default function MandateApplicationForm({
 
         <Button
           onClick={nextStep}
-          disabled={
-            isLoading ||
-            (currentStepIndex === steps.length - 1 && !agreeToTerms)
-          }
+          disabled={isLoading}
+          className="bg-primary hover:bg-primary/90"
         >
-          {isLoading
-            ? "Processing..."
-            : currentStepIndex === steps.length - 1
-            ? "Submit Application"
-            : "Continue"}
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              Processing...
+            </div>
+          ) : currentStepIndex === steps.length - 1 ? (
+            "Submit Application"
+          ) : (
+            "Continue"
+          )}
         </Button>
       </div>
     </Card>
