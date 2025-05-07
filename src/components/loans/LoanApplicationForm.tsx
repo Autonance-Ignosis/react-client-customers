@@ -257,6 +257,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             id="logIncome"
             name="logIncome"
             type="number"
+            min="0"
             value={formData.logIncome}
             onChange={handleInputChange}
           />
@@ -284,6 +285,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             id="revolvingBalance"
             name="revolvingBalance"
             type="number"
+            min="0"
             value={formData.revolvingBalance}
             onChange={handleInputChange}
           />
@@ -423,6 +425,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             id="daysWithCreditLine"
             name="daysWithCreditLine"
             type="number"
+            min="0"
             value={formData.daysWithCreditLine}
             onChange={handleInputChange}
           />

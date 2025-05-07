@@ -1,4 +1,4 @@
-
+import { toast } from 'sonner'; 
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -20,13 +20,23 @@ export default function HomePage() {
           <div className="bg-card p-6 rounded-lg shadow-sm border border-border">
             <h2 className="text-2xl font-semibold mb-4">Loan Application</h2>
             <p className="mb-4">Quick and hassle-free loan applications. Get approvals faster with our streamlined process.</p>
-            <Button onClick={() => navigate('/loans/apply')}>Apply Now</Button>
+            <Button onClick={() => navigate('/loans')}>Apply Now</Button>
           </div>
 
           <div className="bg-card p-6 rounded-lg shadow-sm border border-border">
             <h2 className="text-2xl font-semibold mb-4">Document Management</h2>
             <p className="mb-4">Securely upload and manage your KYC documents in one place for faster verification.</p>
-            <Button onClick={() => navigate('/kyc')}>Upload Documents</Button>
+            <Button
+                onClick={() => {
+                if (user?.kycStatus === 'VERIFIED') {
+                  toast.info('Your KYC is already verified.');
+                } else {
+                  navigate('/kyc');
+                }
+              }}
+              >
+              Upload Documents
+            </Button>
           </div>
         </div>
 
