@@ -30,8 +30,7 @@ export function Sidebar({ className }: SidebarProps) {
   const { user } = useSelector((state: any) => state.user) || {};
   const isKycVerified = user?.kycStatus == "VERIFIED" || false;
 
-  console.log("User in Sidebar:", user);
-  console.log("KYC Verified in Sidebar:", isKycVerified);
+
 
   // Check if screen is mobile on mount and when window resizes
   useEffect(() => {
@@ -114,7 +113,7 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="p-4">
             <div className="flex items-center gap-2 mb-8">
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
-                M
+                A
               </div>
               {!collapsed || isMobile ? (
                 <h1 className="text-xl font-bold">MandateFlow</h1>

@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as Sonner, toast } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { useEffect } from "react";
@@ -23,6 +23,7 @@ import NotFound from "@/pages/NotFound";
 import { useDispatch, useSelector } from "react-redux";
 import LoanOffers from "./pages/LoanOffers";
 import LoanApplicationsPage from "./pages/LoanApplications";
+import MandateApplication from "./pages/MandateApplication";
 
 const queryClient = new QueryClient();
 
@@ -62,10 +63,26 @@ const RequireKyc = ({ children }) => {
 const App = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.user) || {};
+  const userId = user?.id;
 
   useEffect(() => {
+
     loadUser();
   }, []);
+
+  useEffect(() => {
+    const socket = new WebSocket(`ws://localhost:8088/ws/notifications?userId=${userId}`);
+
+    socket.onmessage = (event) => {
+      const message = event.data;
+      console.log("Received message:", message);
+      toast.success(message);
+    };
+
+    return () => socket.close();
+  }, [userId]);
+
+
 
   const loadUser = async () => {
     try {
@@ -136,11 +153,22 @@ const App = () => {
                   </RequireKyc>
                 } />
 
-                <Route path="/mandate" element={
+                <Route path="/mandate/:id" element={
                   <RequireKyc>
                     <MandateSetup />
                   </RequireKyc>
                 } />
+
+
+                <Route
+                  path="/mandate/apply/:bankId/:loanId"
+                  element={
+                    <RequireKyc>
+                      <MandateApplication />
+                    </RequireKyc>
+                  }
+                />
+
 
                 <Route path="/notifications" element={
                   <RequireKyc>
