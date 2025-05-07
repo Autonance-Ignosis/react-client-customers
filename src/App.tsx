@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import LoanOffers from "./pages/LoanOffers";
 import LoanApplicationsPage from "./pages/LoanApplications";
 import MandateApplication from "./pages/MandateApplication";
+import Transactions from "./pages/Transactions";
 
 const queryClient = new QueryClient();
 
@@ -199,6 +200,15 @@ const App = () => {
                   element={
                     <RequireKyc>
                       <Settings />
+                    </RequireKyc>
+                  }
+                />
+
+                <Route
+                  path="/transactions"
+                  element={
+                    <RequireKyc>
+                      <Transactions></Transactions>
                     </RequireKyc>
                   }
                 />

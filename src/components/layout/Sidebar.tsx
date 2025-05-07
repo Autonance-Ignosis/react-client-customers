@@ -30,8 +30,6 @@ export function Sidebar({ className }: SidebarProps) {
   const { user } = useSelector((state: any) => state.user) || {};
   const isKycVerified = user?.kycStatus == "VERIFIED" || false;
 
-
-
   // Check if screen is mobile on mount and when window resizes
   useEffect(() => {
     const checkIfMobile = () => {
@@ -58,7 +56,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "Loan Offers", path: "/loans", icon: CreditCard },
     { name: "My Applications", path: "/loans/applications", icon: FileClock },
     { name: "KYC Verification", path: "/kyc", icon: Upload },
-    { name: "Mandate Setup", path: "/mandate", icon: CreditCard },
+    { name: "Your Transactions", path: "/Transactions", icon: CreditCard },
     { name: "Notifications", path: "/notifications", icon: Bell },
     { name: "Settings", path: "/settings", icon: Settings },
   ];
