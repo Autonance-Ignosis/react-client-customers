@@ -19,6 +19,7 @@ export default function Logout() {
     const dispatch = useDispatch();
     const [showProfileCard, setShowProfileCard] = useState(false);
     const { user } = useSelector((state: any) => state.user) || {};
+    console.log("User in Logout:", user);
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -49,7 +50,7 @@ export default function Logout() {
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                         <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+                            <AvatarImage src={user.picture} alt="User" />
                             <AvatarFallback>SC</AvatarFallback>
                         </Avatar>
                     </Button>
