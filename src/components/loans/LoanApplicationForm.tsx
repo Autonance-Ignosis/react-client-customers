@@ -1,21 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
-import { ProgressSteps } from "../ui-custom/ProgressSteps"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { GlassCard } from "../ui-custom/GlassCard"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import axios from "axios"
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { ProgressSteps } from "../ui-custom/ProgressSteps";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { GlassCard } from "../ui-custom/GlassCard";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import axios from "axios";
 
 // Steps configuration
 const steps = [
@@ -23,31 +36,31 @@ const steps = [
   { id: 1, name: "financial", title: "Financial Details" },
   { id: 2, name: "loan", title: "Loan Requirements" },
   { id: 3, name: "credit", title: "Credit Information" },
-  { id: 4, name: "review", title: "Review & Submit" }
-]
+  { id: 4, name: "review", title: "Review & Submit" },
+];
 
 interface LoanOffer {
-  id: number
-  bankId: number
-  offerName: string | null
-  interestRate: number
-  maxTenureInMonths: number
-  maxAmount: number
-  description: string
+  id: number;
+  bankId: number;
+  offerName: string | null;
+  interestRate: number;
+  maxTenureInMonths: number;
+  maxAmount: number;
+  description: string;
 }
 
 export function LoanApplicationForm({ loanId }: { loanId?: number }) {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingOffer, setIsLoadingOffer] = useState(false)
-  const [agreeToTerms, setAgreeToTerms] = useState(false)
-  const [loanOffer, setLoanOffer] = useState<LoanOffer | null>(null)
-  const navigate = useNavigate()
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingOffer, setIsLoadingOffer] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [loanOffer, setLoanOffer] = useState<LoanOffer | null>(null);
+  const navigate = useNavigate();
 
   // Get user data from Redux store
-  const { user } = useSelector((state: any) => state.user) || {}
+  const { user } = useSelector((state: any) => state.user) || {};
 
-  console.log("User Data:", loanId)
+  console.log("User Data:", loanId);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -69,112 +82,114 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
     inquiryLast6Months: 1,
     timesLateIn2Years: 0,
     derogatoryPublicRecords: 0,
-  })
+  });
 
   useEffect(() => {
     // Fetch loan offer details if loanId is provided
     if (loanId) {
-      fetchLoanOffer(loanId)
+      fetchLoanOffer(loanId);
     }
-  }, [loanId])
+  }, [loanId]);
 
   const fetchLoanOffer = async (id: number) => {
-    setIsLoadingOffer(true)
+    setIsLoadingOffer(true);
     try {
+      const { data } = await axios.get(
+        `http://localhost:8080/api/loan-offers/${loanId}`
+      );
 
+      console.log("Loan Offer Data:", data);
 
-      const { data } = await axios.get(`http://localhost:8080/api/loan-offers/${loanId}`);
-
-      console.log("Loan Offer Data:", data)
-
-
-      setLoanOffer(data)
-      setFormData(prev => ({
+      setLoanOffer(data);
+      setFormData((prev) => ({
         ...prev,
         loanOfferId: data.id,
         interestRate: data.interestRate,
         maxTenureInMonths: data.maxTenureInMonths,
         maxAmount: data.maxAmount,
         appliedBankId: data.bankId,
-      }))
+      }));
     } catch (error) {
-      console.log(error)
-      toast.error("Failed to fetch loan offer details")
+      console.log(error);
+      toast.error("Failed to fetch loan offer details");
     } finally {
-      setIsLoadingOffer(false)
+      setIsLoadingOffer(false);
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value
-    }))
-  }
+      [name]: type === "number" ? parseFloat(value) : value,
+    }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleSliderChange = (name: string, value: number[]) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value[0]
-    }))
-  }
+      [name]: value[0],
+    }));
+  };
 
   const handleSwitchChange = (name: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: checked
-    }))
-  }
+      [name]: checked,
+    }));
+  };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: checked
-    }))
-  }
+      [name]: checked,
+    }));
+  };
 
   const nextStep = () => {
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(prev => prev + 1)
+      setCurrentStepIndex((prev) => prev + 1);
     } else {
-      handleSubmit()
+      handleSubmit();
     }
-  }
+  };
 
   const prevStep = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1)
+      setCurrentStepIndex((prev) => prev - 1);
     }
-  }
+  };
 
   const handleSubmit = async () => {
     if (!agreeToTerms) {
-      toast.error("Please agree to the terms and conditions")
-      return
+      toast.error("Please agree to the terms and conditions");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // Mock API call - replace with actual API call
 
-      const response = await axios.post("http://localhost:8080/api/loans", formData);
+      const response = await axios.post(
+        "http://localhost:8080/api/loans",
+        formData
+      );
       console.log("Response:", response.data);
-      toast.success("Loan application submitted successfully!")
+      toast.success("Loan application submitted successfully!");
       // navigate("/dashboard/loans")
     } catch (error) {
-      toast.error("Failed to submit loan application")
+      toast.error("Failed to submit loan application");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const renderPersonalInfoStep = () => {
     return (
@@ -194,7 +209,9 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
           <Label htmlFor="bankAccountId">Select Bank Account</Label>
           <Select
             value={formData.bankAccountId.toString()}
-            onValueChange={(value) => handleSelectChange("bankAccountId", value)}
+            onValueChange={(value) =>
+              handleSelectChange("bankAccountId", value)
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Select bank account" />
@@ -236,14 +253,14 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
           </RadioGroup>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderFinancialDetailsStep = () => {
     return (
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="logIncome">Monthly Income</Label>
+          <Label htmlFor="logIncome">Monthly Income &#8377;</Label>
           <Input
             id="logIncome"
             name="logIncome"
@@ -254,17 +271,23 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         </div>
 
         <div className="space-y-2">
-          <Label>Debt-to-Income Ratio: {(formData.debtIncomeRatio * 100).toFixed(0)}%</Label>
+          <Label>
+            Debt-to-Income Ratio: {(formData.debtIncomeRatio * 100).toFixed(0)}%
+          </Label>
           <Slider
             defaultValue={[formData.debtIncomeRatio * 100]}
             max={100}
             step={1}
-            onValueChange={(value) => handleSliderChange("debtIncomeRatio", [value[0] / 100])}
+            onValueChange={(value) =>
+              handleSliderChange("debtIncomeRatio", [value[0] / 100])
+            }
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="revolvingBalance">Current Revolving Balance</Label>
+          <Label htmlFor="revolvingBalance">
+            Current Revolving Balance &#8377;
+          </Label>
           <Input
             id="revolvingBalance"
             name="revolvingBalance"
@@ -275,17 +298,22 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         </div>
 
         <div className="space-y-2">
-          <Label>Revolving Utilization: {(formData.revolvingUtilization * 100).toFixed(0)}%</Label>
+          <Label>
+            Revolving Utilization:{" "}
+            {(formData.revolvingUtilization * 100).toFixed(0)}%
+          </Label>
           <Slider
             defaultValue={[formData.revolvingUtilization * 100]}
             max={100}
             step={1}
-            onValueChange={(value) => handleSliderChange("revolvingUtilization", [value[0] / 100])}
+            onValueChange={(value) =>
+              handleSliderChange("revolvingUtilization", [value[0] / 100])
+            }
           />
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderLoanRequirementsStep = () => {
     return (
@@ -298,14 +326,19 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             </CardHeader>
             <CardContent>
               <p>Interest Rate: {loanOffer.interestRate}%</p>
-              <p>Maximum Loan Amount: ${loanOffer.maxAmount.toLocaleString()}</p>
+              <p>
+                Maximum Loan Amount: &#8377;
+                {loanOffer.maxAmount.toLocaleString()}
+              </p>
               <p>Maximum Tenure: {loanOffer.maxTenureInMonths} months</p>
             </CardContent>
           </Card>
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="amount">Loan Amount: ${formData.amount.toLocaleString()}</Label>
+          <Label htmlFor="amount">
+            Loan Amount: &#8377;{formData.amount.toLocaleString()}
+          </Label>
           <Slider
             defaultValue={[formData.amount]}
             min={100000}
@@ -316,18 +349,24 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="tenureInMonths">Loan Tenure: {formData.tenureInMonths} months</Label>
+          <Label htmlFor="tenureInMonths">
+            Loan Tenure: {formData.tenureInMonths} months
+          </Label>
           <Slider
             defaultValue={[formData.tenureInMonths]}
             min={12}
             max={loanOffer?.maxTenureInMonths || 60}
             step={6}
-            onValueChange={(value) => handleSliderChange("tenureInMonths", value)}
+            onValueChange={(value) =>
+              handleSliderChange("tenureInMonths", value)
+            }
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="interestRate">Interest Rate: {formData.interestRate}%</Label>
+          <Label htmlFor="interestRate">
+            Interest Rate: {formData.interestRate}%
+          </Label>
           <Input
             id="interestRate"
             name="interestRate"
@@ -343,13 +382,32 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         <div className="bg-green-700 p-4 rounded-lg">
           <p className="font-medium">Estimated Monthly Payment</p>
           <p className="text-2xl font-bold">
-            ${(formData.amount * (formData.interestRate / 1200) / (1 - Math.pow(1 + (formData.interestRate / 1200), -formData.tenureInMonths))).toFixed(2)}
+            &#8377;
+            {(
+              (formData.amount * (formData.interestRate / 1200)) /
+              (1 -
+                Math.pow(
+                  1 + formData.interestRate / 1200,
+                  -formData.tenureInMonths
+                ))
+            ).toFixed(2)}
           </p>
-          <p className="text-sm text-gray-200">Total repayment: ${((formData.amount * (formData.interestRate / 1200) / (1 - Math.pow(1 + (formData.interestRate / 1200), -formData.tenureInMonths))) * formData.tenureInMonths).toFixed(2)}</p>
+          <p className="text-sm text-gray-200">
+            Total repayment: &#8377;
+            {(
+              ((formData.amount * (formData.interestRate / 1200)) /
+                (1 -
+                  Math.pow(
+                    1 + formData.interestRate / 1200,
+                    -formData.tenureInMonths
+                  ))) *
+              formData.tenureInMonths
+            ).toFixed(2)}
+          </p>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderCreditInfoStep = () => {
     return (
@@ -379,7 +437,9 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="inquiryLast6Months">Number of Credit Inquiries (Last 6 Months)</Label>
+          <Label htmlFor="inquiryLast6Months">
+            Number of Credit Inquiries (Last 6 Months)
+          </Label>
           <Input
             id="inquiryLast6Months"
             name="inquiryLast6Months"
@@ -391,7 +451,9 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="timesLateIn2Years">Late Payments (Last 2 Years)</Label>
+          <Label htmlFor="timesLateIn2Years">
+            Late Payments (Last 2 Years)
+          </Label>
           <Input
             id="timesLateIn2Years"
             name="timesLateIn2Years"
@@ -403,7 +465,9 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="derogatoryPublicRecords">Derogatory Public Records</Label>
+          <Label htmlFor="derogatoryPublicRecords">
+            Derogatory Public Records
+          </Label>
           <Input
             id="derogatoryPublicRecords"
             name="derogatoryPublicRecords"
@@ -418,17 +482,26 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
           <Switch
             id="creditCriteriaMet"
             checked={formData.creditCriteriaMet}
-            onCheckedChange={(checked) => handleSwitchChange("creditCriteriaMet", checked)}
+            onCheckedChange={(checked) =>
+              handleSwitchChange("creditCriteriaMet", checked)
+            }
           />
-          <Label htmlFor="creditCriteriaMet">I confirm that the credit information provided is accurate</Label>
+          <Label htmlFor="creditCriteriaMet">
+            I confirm that the credit information provided is accurate and
+            incase of wrong information banks are allowed to take legal action
+            against me.
+          </Label>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderReviewStep = () => {
     // Calculate some summary values
-    const monthlyPayment = formData.amount * (formData.interestRate / 1200) / (1 - Math.pow(1 + (formData.interestRate / 1200), -formData.tenureInMonths));
+    const monthlyPayment =
+      (formData.amount * (formData.interestRate / 1200)) /
+      (1 -
+        Math.pow(1 + formData.interestRate / 1200, -formData.tenureInMonths));
     const totalRepayment = monthlyPayment * formData.tenureInMonths;
     const totalInterest = totalRepayment - formData.amount;
 
@@ -439,24 +512,33 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         <div className="bg-gray-800 p-4 rounded-lg space-y-4">
           <div>
             <h4 className="font-medium">Loan Details</h4>
-            <p>Amount: ${formData.amount.toLocaleString()}</p>
-            <p>Purpose: {formData.purpose.charAt(0).toUpperCase() + formData.purpose.slice(1)}</p>
+            <p>Amount: &#8377;{formData.amount.toLocaleString()}</p>
+            <p>
+              Purpose:{" "}
+              {formData.purpose.charAt(0).toUpperCase() +
+                formData.purpose.slice(1)}
+            </p>
             <p>Tenure: {formData.tenureInMonths} months</p>
             <p>Interest Rate: {formData.interestRate}%</p>
           </div>
 
           <div>
             <h4 className="font-medium">Payment Summary</h4>
-            <p>Monthly Payment: ${monthlyPayment.toFixed(2)}</p>
-            <p>Total Repayment: ${totalRepayment.toFixed(2)}</p>
-            <p>Total Interest: ${totalInterest.toFixed(2)}</p>
+            <p>Monthly Payment: &#8377;{monthlyPayment.toFixed(2)}</p>
+            <p>Total Repayment: &#8377;{totalRepayment.toFixed(2)}</p>
+            <p>Total Interest: &#8377;{totalInterest.toFixed(2)}</p>
           </div>
 
           <div>
             <h4 className="font-medium">Credit Information</h4>
             <p>FICO Score: {formData.ficoScore}</p>
-            <p>Credit Age: {(formData.daysWithCreditLine / 365).toFixed(1)} years</p>
-            <p>Debt-to-Income Ratio: {(formData.debtIncomeRatio * 100).toFixed(0)}%</p>
+            <p>
+              Credit Age: {(formData.daysWithCreditLine / 365).toFixed(1)} years
+            </p>
+            <p>
+              Debt-to-Income Ratio:{" "}
+              {(formData.debtIncomeRatio * 100).toFixed(0)}%
+            </p>
             <p>Recent Inquiries: {formData.inquiryLast6Months}</p>
           </div>
         </div>
@@ -468,30 +550,31 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
           />
           <Label htmlFor="agreeToTerms" className="text-sm">
-            I agree to the terms and conditions, and confirm that all information provided is accurate.
-            I understand that providing false information may result in my application being rejected.
+            I agree to the terms and conditions, and confirm that all
+            information provided is accurate. I understand that providing false
+            information may result in my application being rejected.
           </Label>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderStep = () => {
     switch (currentStepIndex) {
       case 0:
-        return renderPersonalInfoStep()
+        return renderPersonalInfoStep();
       case 1:
-        return renderFinancialDetailsStep()
+        return renderFinancialDetailsStep();
       case 2:
-        return renderLoanRequirementsStep()
+        return renderLoanRequirementsStep();
       case 3:
-        return renderCreditInfoStep()
+        return renderCreditInfoStep();
       case 4:
-        return renderReviewStep()
+        return renderReviewStep();
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -502,9 +585,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
       />
 
       <GlassCard className="p-6">
-        <div className="space-y-6">
-          {renderStep()}
-        </div>
+        <div className="space-y-6">{renderStep()}</div>
 
         <div className="mt-8 flex justify-between">
           <Button
@@ -515,14 +596,15 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             Back
           </Button>
 
-          <Button
-            onClick={nextStep}
-            disabled={isLoading}
-          >
-            {isLoading ? "Processing..." : currentStepIndex === steps.length - 1 ? "Submit Application" : "Continue"}
+          <Button onClick={nextStep} disabled={isLoading}>
+            {isLoading
+              ? "Processing..."
+              : currentStepIndex === steps.length - 1
+              ? "Submit Application"
+              : "Continue"}
           </Button>
         </div>
       </GlassCard>
     </div>
-  )
+  );
 }

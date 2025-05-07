@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Home,
   FileText,
@@ -14,9 +14,9 @@ import {
   LogOut,
   MessageSquare,
   ChevronLeft,
-  FileClock
-} from 'lucide-react';
-import { useSelector } from 'react-redux';
+  FileClock,
+} from "lucide-react";
+import { useSelector } from "react-redux";
 
 type SidebarProps = {
   className?: string;
@@ -43,9 +43,9 @@ export function Sidebar({ className }: SidebarProps) {
     };
 
     checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
+    window.addEventListener("resize", checkIfMobile);
 
-    return () => window.removeEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   const toggleSidebar = () => {
@@ -54,26 +54,28 @@ export function Sidebar({ className }: SidebarProps) {
 
   // Define all possible navigation items
   const allNavItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Dashboard', path: '/dashboard', icon: Home },
-    { name: 'Loan Offers', path: '/loans', icon: CreditCard },
-    { name: 'My Applications', path: '/loans/applications', icon: FileClock },
-    { name: 'KYC Verification', path: '/kyc', icon: Upload },
-    { name: 'Mandate Setup', path: '/mandate', icon: CreditCard },
-    { name: 'Notifications', path: '/notifications', icon: Bell },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    { name: "Home", path: "/", icon: Home },
+    { name: "Dashboard", path: "/dashboard", icon: Home },
+    { name: "Loan Offers", path: "/loans", icon: CreditCard },
+    { name: "My Applications", path: "/loans/applications", icon: FileClock },
+    { name: "KYC Verification", path: "/kyc", icon: Upload },
+    { name: "Mandate Setup", path: "/mandate", icon: CreditCard },
+    { name: "Notifications", path: "/notifications", icon: Bell },
+    { name: "Settings", path: "/settings", icon: Settings },
   ];
 
   // Filter navigation items based on user state and KYC verification
   const getNavItems = () => {
     // If user is null, only show Home
     if (!user) {
-      return allNavItems.filter(item => item.name === 'Home');
+      return allNavItems.filter((item) => item.name === "Home");
     }
 
     // If user exists but KYC is not verified, only show KYC Upload
     if (user && !isKycVerified) {
-      return allNavItems.filter(item => item.name === 'KYC Verification' || item.name === 'Home');
+      return allNavItems.filter(
+        (item) => item.name === "KYC Verification" || item.name === "Home"
+      );
     }
 
     // If user exists and KYC is verified, show all items
@@ -94,19 +96,29 @@ export function Sidebar({ className }: SidebarProps) {
         {collapsed ? <Menu /> : <X />}
       </Button>
 
-      <aside className={cn(
-        "fixed top-0 left-0 z-40 h-full transition-all duration-300 bg-background border-r border-border shadow-sm",
-        collapsed ? (isMobile ? "-translate-x-full" : "w-16") : (isMobile ? "w-64" : "w-64"),
-        isMobile ? "lg:translate-x-0" : "",
-        className
-      )}>
+      <aside
+        className={cn(
+          "fixed top-0 left-0 z-40 h-full transition-all duration-300 bg-background border-r border-border shadow-sm",
+          collapsed
+            ? isMobile
+              ? "-translate-x-full"
+              : "w-16"
+            : isMobile
+            ? "w-64"
+            : "w-64",
+          isMobile ? "lg:translate-x-0" : "",
+          className
+        )}
+      >
         <div className="flex flex-col h-full">
           <div className="p-4">
             <div className="flex items-center gap-2 mb-8">
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
                 M
               </div>
-              {!collapsed || isMobile ? <h1 className="text-xl font-bold">MandateFlow</h1> : null}
+              {!collapsed || isMobile ? (
+                <h1 className="text-xl font-bold">MandateFlow</h1>
+              ) : null}
             </div>
 
             <nav className="space-y-1">
@@ -137,22 +149,10 @@ export function Sidebar({ className }: SidebarProps) {
               )}
             >
               <MessageSquare className="w-5 h-5" />
-              {!collapsed || isMobile ? <span className="ml-2">AI Assistant</span> : null}
+              {!collapsed || isMobile ? (
+                <span className="ml-2">AI Assistant</span>
+              ) : null}
             </Button>
-
-            {/* Only show Logout if user exists */}
-            {user && (
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full text-muted-foreground mt-2",
-                  collapsed && !isMobile ? "justify-center" : "justify-start"
-                )}
-              >
-                <LogOut className="w-5 h-5" />
-                {!collapsed || isMobile ? <span className="ml-2">Logout</span> : null}
-              </Button>
-            )}
           </div>
 
           {/* Collapse/Expand Button (only visible on desktop) */}
@@ -162,7 +162,12 @@ export function Sidebar({ className }: SidebarProps) {
             onClick={toggleSidebar}
             className="absolute -right-3 top-16 bg-background border border-border rounded-full shadow-sm hidden lg:flex"
           >
-            <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed ? "rotate-180" : "")} />
+            <ChevronLeft
+              className={cn(
+                "w-4 h-4 transition-transform",
+                collapsed ? "rotate-180" : ""
+              )}
+            />
           </Button>
         </div>
       </aside>
