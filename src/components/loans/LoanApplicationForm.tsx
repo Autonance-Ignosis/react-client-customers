@@ -206,24 +206,6 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
           />
         </div> */}
 
-        <div className="space-y-2">
-          <Label htmlFor="bankAccountId">Select Bank Account</Label>
-          <Select
-            value={formData.bankAccountId.toString()}
-            onValueChange={(value) =>
-              handleSelectChange("bankAccountId", value)
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select bank account" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Primary Checking (****1234)</SelectItem>
-              <SelectItem value="2">Savings Account (****5678)</SelectItem>
-              <SelectItem value="3">Joint Account (****9012)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
         <div className="space-y-2">
           <Label htmlFor="purpose">Loan Purpose</Label>
@@ -266,6 +248,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             id="logIncome"
             name="logIncome"
             type="number"
+            min="0"
             value={formData.logIncome}
             onChange={handleInputChange}
           />
@@ -293,6 +276,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             id="revolvingBalance"
             name="revolvingBalance"
             type="number"
+            min="0"
             value={formData.revolvingBalance}
             onChange={handleInputChange}
           />
@@ -432,6 +416,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             id="daysWithCreditLine"
             name="daysWithCreditLine"
             type="number"
+            min="0"
             value={formData.daysWithCreditLine}
             onChange={handleInputChange}
           />
