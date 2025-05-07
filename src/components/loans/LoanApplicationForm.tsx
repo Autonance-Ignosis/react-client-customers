@@ -158,6 +158,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
       handleSubmit();
+      navigate("/dashboard");
     }
   };
 
