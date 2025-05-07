@@ -25,8 +25,45 @@ interface MandateApplicationFormProps {
   loanAmount: number;
   emi: number;
   loanId: string;
-  onConfirm: () => void;
+  // onConfirm: () => void;
 }
+
+// Enum values for dropdown selections
+const MANDATE_VARIANTS = {
+  E_NACH_AADHAAR_NETBANKING_CREDITCARD: "E-NACH (Aadhaar, Netbanking, Credit Card)"
+};
+
+const CATEGORY_TYPES = {
+  BILL_PAYMENT_CREDIT_CARD: "Bill Payment - Credit Card",
+  B2B_CORPORATE: "B2B Corporate",
+  SUBSCRIPTION_FEES: "Subscription Fees",
+  INSUARANCE_PREMIUM: "Insurance Premium",
+  INSUARANCE_OTHER_PAYMENT: "Insurance Other Payment",
+  EMI_LOAN_REPAYMENT: "EMI Loan Repayment"
+};
+
+const FREQUENCY_TYPES = {
+  ADHO: "Ad-hoc",
+  INTRA_DAY: "Intra-day",
+  DAILY: "Daily",
+  WEEKLY: "Weekly",
+  MONTHLY: "Monthly",
+  BY_MONTHLY: "Bi-monthly",
+  QUARTERLY: "Quarterly",
+  SEMI_ANNUALLY: "Semi-annually",
+  YEARLY: "Yearly"
+};
+
+const DEBIT_TYPES = {
+  FIXED: "Fixed",
+  VARIABLE: "Variable",
+  ONE_TIME: "One Time"
+};
+
+const SEQUENCE_TYPES = {
+  RECURRING: "Recurring",
+  ONE_TIME: "One Time"
+};
 
 // Steps configuration
 const steps = [
@@ -37,10 +74,9 @@ const steps = [
 
 export default function MandateApplicationForm({
   bankId,
-  loanAmount,
   emi,
   loanId,
-  onConfirm,
+  // onConfirm,
 }: MandateApplicationFormProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,9 +94,11 @@ export default function MandateApplicationForm({
     creditIfscCode: "",
 
     // Mandate Details
-    mandateVariant: "E-NACH (Aadhaar, Netbanking)",
+    mandateVariant: "E_NACH_AADHAAR_NETBANKING_CREDITCARD",
     category: "",
     debitType: "",
+    seqType: "RECURRING", // Default to RECURRING
+    freqType: "MONTHLY", // Default to MONTHLY
     schemaName: "",
     amount: emi,
     startDate: new Date().toISOString().split("T")[0],
@@ -200,7 +238,7 @@ export default function MandateApplicationForm({
       window.scrollTo(0, 0); // Scroll to top when changing steps
     } else {
       handleSubmit();
-      navigate("/dashboard");
+      // navigate("/dashboard");
     }
   };
 
@@ -227,6 +265,8 @@ export default function MandateApplicationForm({
         if (
           !formData.category ||
           !formData.debitType ||
+          !formData.seqType ||
+          !formData.freqType ||
           !formData.schemaName ||
           !formData.amount ||
           !formData.startDate ||
@@ -262,11 +302,11 @@ export default function MandateApplicationForm({
       loanId: loanId,
       userId: user.user.id,
       bankAccountId: bankId,
-      mandateVariant: "E_NACH_AADHAAR_NETBANKING_CREDITCARD",
+      mandateVariant: formData.mandateVariant,
       category: formData.category,
       debitType: formData.debitType,
-      seqType: "RECURRING",
-      freqType: "MONTHLY",
+      seqType: formData.seqType,
+      freqType: formData.freqType,
       schemaName: formData.schemaName,
       consRefNo: formData.consRefNo,
       amount: Number(formData.amount),
@@ -275,6 +315,8 @@ export default function MandateApplicationForm({
       upTo40Years: formData.upTo40Years,
     };
 
+    console.log("Mandate Payload:", mandatePayload);
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/mandates",
@@ -282,7 +324,7 @@ export default function MandateApplicationForm({
       );
       console.log("Mandate submitted:", response.data);
       toast.success("Mandate application submitted successfully");
-      onConfirm();
+      // onConfirm();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(
@@ -290,8 +332,7 @@ export default function MandateApplicationForm({
           error.response?.data || error.message
         );
         toast.error(
-          `Submission failed: ${
-            error.response?.data?.message || "Please try again later"
+          `Submission failed: ${error.response?.data?.message || "Please try again later"
           }`
         );
       } else {
@@ -393,9 +434,11 @@ export default function MandateApplicationForm({
                 <SelectValue placeholder="Select Mandate Variant" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="E-NACH (Aadhaar, Netbanking)">
-                  E-NACH (Aadhaar, Netbanking)
-                </SelectItem>
+                {Object.entries(MANDATE_VARIANTS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -414,22 +457,57 @@ export default function MandateApplicationForm({
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="BILL_PAYMENT_CREDIT_CARD">
-                  Bill Payment - Credit Card
-                </SelectItem>
-                <SelectItem value="B2B_CORPORATE">B2B Corporate</SelectItem>
-                <SelectItem value="SUBSCRIPTION_FEES">
-                  Subscription Fees
-                </SelectItem>
-                <SelectItem value="INSUARANCE_PREMIUM">
-                  Insurance Premium
-                </SelectItem>
-                <SelectItem value="INSUARANCE_OTHER_PAYMENT">
-                  Insurance Other Payment
-                </SelectItem>
-                <SelectItem value="EMI_LOAN_REPAYMENT">
-                  EMI Loan Repayment
-                </SelectItem>
+                {Object.entries(CATEGORY_TYPES).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="seqType" className="flex">
+              Sequence Type <span className="text-red-500 ml-1">*</span>
+            </Label>
+            <Select
+              value={formData.seqType}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, seqType: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Sequence Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(SEQUENCE_TYPES).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="freqType" className="flex">
+              Frequency Type <span className="text-red-500 ml-1">*</span>
+            </Label>
+            <Select
+              value={formData.freqType}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, freqType: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Frequency Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(FREQUENCY_TYPES).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -448,9 +526,11 @@ export default function MandateApplicationForm({
                 <SelectValue placeholder="Select Debit Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FIXED">Fixed</SelectItem>
-                <SelectItem value="VARIABLE">Variable</SelectItem>
-                <SelectItem value="ONE_TIME">One Time</SelectItem>
+                {Object.entries(DEBIT_TYPES).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -546,7 +626,7 @@ export default function MandateApplicationForm({
       <div className="space-y-6">
         <div className="flex items-center gap-2 mb-4">
           <CreditCard className="h-6 w-6 text-primary" />
-          {/* <h3 className="text-lg font-medium">Contact Details</h3> */}
+          <h3 className="text-lg font-medium">Terms and Conditions</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

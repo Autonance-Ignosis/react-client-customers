@@ -33,9 +33,9 @@ export default function MandateApplication() {
         loanAmount={loanAmount}
         emi={emi}
         loanId={loanId}
-        onConfirm={() => {
-          <MainLayout />;
-        }}
+      // onConfirm={() => {
+      //   <MainLayout />;
+      // }}
       />
     </div>
   );
