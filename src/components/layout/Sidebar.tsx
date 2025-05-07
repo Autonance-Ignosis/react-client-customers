@@ -78,7 +78,7 @@ export function Sidebar({ className }: SidebarProps) {
     }
 
     // If user exists and KYC is verified, show all items
-    return allNavItems;
+    return allNavItems.filter((item) => item.name !== "KYC Verification");
   };
 
   const navItems = getNavItems();
