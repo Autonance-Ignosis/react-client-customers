@@ -51,7 +51,7 @@ export function Sidebar({ className }: SidebarProps) {
 
   // Define all possible navigation items
   const allNavItems = [
-    { name: "Home", path: "/", icon: Home },
+    { name: "Home", path: "/home", icon: Home },
     { name: "Dashboard", path: "/dashboard", icon: Home },
     { name: "Loan Offers", path: "/loans", icon: CreditCard },
     { name: "My Applications", path: "/loans/applications", icon: FileClock },
