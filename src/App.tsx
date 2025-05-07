@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import LoanOffers from "./pages/LoanOffers";
 import LoanApplicationsPage from "./pages/LoanApplications";
 import MandateApplication from "./pages/MandateApplication";
+import LandingPage from "./pages/LandingPage";
 
 const queryClient = new QueryClient();
 
@@ -109,83 +110,106 @@ const App = () => {
           <Toaster />
           <Sonner position="top-right" />
           <BrowserRouter>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={
-                user ? <Navigate to="/" replace /> : <AuthPage />
-              } />
+          <Routes>
+  {/* Public Routes */}
+  <Route
+    path="/login"
+    element={user ? <Navigate to="/home" replace /> : <AuthPage />}
+  />
 
-              {/* Main Layout Routes */}
-              <Route path="/" element={<MainLayout />}>
-                {/* Home is accessible to all */}
-                <Route index element={<HomePage />} />
+  <Route path="/" element={<LandingPage />} />
 
-                {/* KYC Upload - Only for authenticated users who need to complete KYC */}
-                <Route path="/kyc" element={
-                  <RequireAuth>
-                    <KycUpload />
-                  </RequireAuth>
-                } />
+  {/* Main Layout Routes */}
+  <Route path="/" element={<MainLayout />}>
+    {/* HomePage moved to /home */}
+    <Route path="home" element={<HomePage />} />
 
-                {/* Routes requiring both authentication and KYC verification */}
-                <Route path="/dashboard" element={
-                  <RequireKyc>
-                    <Dashboard />
-                  </RequireKyc>
-                } />
+    <Route
+      path="kyc"
+      element={
+        <RequireAuth>
+          <KycUpload />
+        </RequireAuth>
+      }
+    />
 
-                <Route path="/loans" element={
-                  <RequireKyc>
-                    <LoanOffers />
-                  </RequireKyc>
-                } />
+    <Route
+      path="dashboard"
+      element={
+        <RequireKyc>
+          <Dashboard />
+        </RequireKyc>
+      }
+    />
 
-                <Route path="/loans/apply/:loanId" element={
-                  <RequireKyc>
-                    <LoanApplication />
-                  </RequireKyc>
-                } />
+    <Route
+      path="loans"
+      element={
+        <RequireKyc>
+          <LoanOffers />
+        </RequireKyc>
+      }
+    />
 
-                <Route path="/loans/applications" element={
-                  <RequireKyc>
-                    <LoanApplicationsPage />
+    <Route
+      path="loans/apply/:loanId"
+      element={
+        <RequireKyc>
+          <LoanApplication />
+        </RequireKyc>
+      }
+    />
 
-                  </RequireKyc>
-                } />
+    <Route
+      path="loans/applications"
+      element={
+        <RequireKyc>
+          <LoanApplicationsPage />
+        </RequireKyc>
+      }
+    />
 
-                <Route path="/mandate/:id" element={
-                  <RequireKyc>
-                    <MandateSetup />
-                  </RequireKyc>
-                } />
+    <Route
+      path="mandate/:id"
+      element={
+        <RequireKyc>
+          <MandateSetup />
+        </RequireKyc>
+      }
+    />
 
+    <Route
+      path="mandate/apply/:bankId/:loanId"
+      element={
+        <RequireKyc>
+          <MandateApplication />
+        </RequireKyc>
+      }
+    />
 
-                <Route
-                  path="/mandate/apply/:bankId/:loanId"
-                  element={
-                    <RequireKyc>
-                      <MandateApplication />
-                    </RequireKyc>
-                  }
-                />
+    <Route
+      path="notifications"
+      element={
+        <RequireKyc>
+          <NotificationsPage />
+        </RequireKyc>
+      }
+    />
 
+    <Route
+      path="settings"
+      element={
+        <RequireKyc>
+          <Settings />
+        </RequireKyc>
+      }
+    />
+  </Route>
 
-                <Route path="/notifications" element={
-                  <RequireKyc>
-                    <NotificationsPage />
-                  </RequireKyc>
-                } />
+  {/* Catch-all route */}
+  <Route path="*" element={<NotFound />} />
+</Routes>
 
-                <Route path="/settings" element={
-                  <RequireKyc>
-                    <Settings />
-                  </RequireKyc>
-                } />
-              </Route>
-
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
