@@ -66,12 +66,13 @@ const App = () => {
   const userId = user?.id;
 
   useEffect(() => {
-
     loadUser();
   }, []);
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://localhost:8088/ws/notifications?userId=${userId}`);
+    const socket = new WebSocket(
+      `ws://localhost:8088/ws/notifications?userId=${userId}`
+    );
 
     socket.onmessage = (event) => {
       const message = event.data;
@@ -81,8 +82,6 @@ const App = () => {
 
     return () => socket.close();
   }, [userId]);
-
-
 
   const loadUser = async () => {
     try {
@@ -111,9 +110,10 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
-              <Route path="/login" element={
-                user ? <Navigate to="/" replace /> : <AuthPage />
-              } />
+              <Route
+                path="/login"
+                element={user ? <Navigate to="/" replace /> : <AuthPage />}
+              />
 
               {/* Main Layout Routes */}
               <Route path="/" element={<MainLayout />}>
@@ -121,44 +121,60 @@ const App = () => {
                 <Route index element={<HomePage />} />
 
                 {/* KYC Upload - Only for authenticated users who need to complete KYC */}
-                <Route path="/kyc" element={
-                  <RequireAuth>
-                    <KycUpload />
-                  </RequireAuth>
-                } />
+                <Route
+                  path="/kyc"
+                  element={
+                    <RequireAuth>
+                      <KycUpload />
+                    </RequireAuth>
+                  }
+                />
 
                 {/* Routes requiring both authentication and KYC verification */}
-                <Route path="/dashboard" element={
-                  <RequireKyc>
-                    <Dashboard />
-                  </RequireKyc>
-                } />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <RequireKyc>
+                      <Dashboard />
+                    </RequireKyc>
+                  }
+                />
 
-                <Route path="/loans" element={
-                  <RequireKyc>
-                    <LoanOffers />
-                  </RequireKyc>
-                } />
+                <Route
+                  path="/loans"
+                  element={
+                    <RequireKyc>
+                      <LoanOffers />
+                    </RequireKyc>
+                  }
+                />
 
-                <Route path="/loans/apply/:loanId" element={
-                  <RequireKyc>
-                    <LoanApplication />
-                  </RequireKyc>
-                } />
+                <Route
+                  path="/loans/apply/:loanId"
+                  element={
+                    <RequireKyc>
+                      <LoanApplication />
+                    </RequireKyc>
+                  }
+                />
 
-                <Route path="/loans/applications" element={
-                  <RequireKyc>
-                    <LoanApplicationsPage />
+                <Route
+                  path="/loans/applications"
+                  element={
+                    <RequireKyc>
+                      <LoanApplicationsPage />
+                    </RequireKyc>
+                  }
+                />
 
-                  </RequireKyc>
-                } />
-
-                <Route path="/mandate/:id" element={
-                  <RequireKyc>
-                    <MandateSetup />
-                  </RequireKyc>
-                } />
-
+                <Route
+                  path="/mandate/:id"
+                  element={
+                    <RequireKyc>
+                      <MandateSetup />
+                    </RequireKyc>
+                  }
+                />
 
                 <Route
                   path="/mandate/apply/:bankId/:loanId"
@@ -169,18 +185,23 @@ const App = () => {
                   }
                 />
 
+                <Route
+                  path="/notifications"
+                  element={
+                    <RequireKyc>
+                      <NotificationsPage />
+                    </RequireKyc>
+                  }
+                />
 
-                <Route path="/notifications" element={
-                  <RequireKyc>
-                    <NotificationsPage />
-                  </RequireKyc>
-                } />
-
-                <Route path="/settings" element={
-                  <RequireKyc>
-                    <Settings />
-                  </RequireKyc>
-                } />
+                <Route
+                  path="/settings"
+                  element={
+                    <RequireKyc>
+                      <Settings />
+                    </RequireKyc>
+                  }
+                />
               </Route>
 
               {/* Catch-all route */}
