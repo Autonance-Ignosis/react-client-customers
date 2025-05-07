@@ -32,11 +32,11 @@ import axios from "axios";
 
 // Steps configuration
 const steps = [
-  { id: 0, name: "personal", title: "Personal Info" },
-  { id: 1, name: "financial", title: "Financial Details" },
-  { id: 2, name: "loan", title: "Loan Requirements" },
-  { id: 3, name: "credit", title: "Credit Information" },
-  { id: 4, name: "review", title: "Review & Submit" },
+  { id: 0, name: "Loan Detail", title: "Loan Detail" },
+  { id: 1, name: "Financial", title: "Financial Details" },
+  { id: 2, name: "Loan", title: "Loan Requirements" },
+  { id: 3, name: "Credit", title: "Credit Information" },
+  { id: 4, name: "Review", title: "Review & Submit" },
 ];
 
 interface LoanOffer {
@@ -65,14 +65,14 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
   // Form state
   const [formData, setFormData] = useState({
     userId: user?.id || 1,
-    bankAccountId: 0,
+    bankAccountId: 1,
     loanOfferId: loanId || 0,
     appliedBankId: 0,
     amount: 500000,
     tenureInMonths: 24,
     interestRate: 9.5,
     creditCriteriaMet: true,
-    purpose: "personal",
+    purpose: "HOME",
     logIncome: 50000,
     debtIncomeRatio: 0.3,
     ficoScore: 700,
@@ -107,6 +107,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
         interestRate: data.interestRate,
         maxTenureInMonths: data.maxTenureInMonths,
         maxAmount: data.maxAmount,
+        purpose: data.loanType,
         appliedBankId: data.bankId,
       }));
     } catch (error) {
@@ -206,35 +207,43 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
           />
         </div> */}
 
-
         <div className="space-y-2">
-          <Label htmlFor="purpose">Loan Purpose</Label>
-          <RadioGroup
-            value={formData.purpose}
-            onValueChange={(value) => handleSelectChange("purpose", value)}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="personal" id="personal" />
-              <Label htmlFor="personal">Personal</Label>
+          {/*  display data fetch using loan id    */}
+
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-center">
+                <Label htmlFor="loanDetails">Loan Details</Label>
+              </div>
+
+              {loanOffer ? (
+                <div className="p-4 bg-black-100 rounded-lg">
+                  <p>
+                    <strong>Loan Offer Name:</strong> {loanOffer.offerName}
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {loanOffer.description}
+                  </p>
+                  <p>
+                    <strong>Interest Rate:</strong> {loanOffer.interestRate}%
+                  </p>
+                  <p>
+                    <strong>Maximum Loan Amount:</strong> &#8377;
+                    {loanOffer.maxAmount.toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Maximum Tenure:</strong>{" "}
+                    {loanOffer.maxTenureInMonths} months
+                  </p>
+                </div>
+              ) : (
+                <p>Loading loan details...</p>
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="education" id="education" />
-              <Label htmlFor="education">Education</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="home" id="home" />
-              <Label htmlFor="home">Home Improvement</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="business" id="business" />
-              <Label htmlFor="business">Business</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="other" id="other" />
-              <Label htmlFor="other">Other</Label>
-            </div>
-          </RadioGroup>
+          </div>
         </div>
+
+        <div className="space-y-2"></div>
       </div>
     );
   };
@@ -558,7 +567,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
       case 4:
         return renderReviewStep();
       default:
-        return null;
+        return handleSubmit();
     }
   };
 
