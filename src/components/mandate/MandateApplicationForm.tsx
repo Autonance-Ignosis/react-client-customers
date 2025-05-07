@@ -18,6 +18,7 @@ import axios from "axios";
 import { DatePicker } from "@/components/ui-custom/Date-Picker";
 import { useSelector } from "react-redux";
 import { Mandate } from "@/types/Mandate";
+import { useNavigate } from "react-router-dom";
 
 interface MandateApplicationFormProps {
   bankId: string;
@@ -72,6 +73,8 @@ export default function MandateApplicationForm({
     mobileNo: "",
     emailId: "",
   });
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -197,6 +200,7 @@ export default function MandateApplicationForm({
       window.scrollTo(0, 0); // Scroll to top when changing steps
     } else {
       handleSubmit();
+      navigate("/dashboard");
     }
   };
 
@@ -546,43 +550,6 @@ export default function MandateApplicationForm({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* <div className="space-y-2">
-            <Label htmlFor="phoneNo">Phone No.</Label>
-            <Input
-              id="phoneNo"
-              name="phoneNo"
-              value={formData.phoneNo}
-              onChange={handleInputChange}
-              placeholder="Enter Phone Number"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="mobileNo" className="flex">
-              Mobile No. <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="mobileNo"
-              name="mobileNo"
-              value={formData.mobileNo}
-              onChange={handleInputChange}
-              placeholder="Enter Mobile Number"
-            />
-          </div>
-
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="emailId" className="flex">
-              Email Id <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Input
-              id="emailId"
-              name="emailId"
-              value={formData.emailId}
-              onChange={handleInputChange}
-              placeholder="Enter Email Address"
-            />
-          </div> */}
-
           <div className="md:col-span-2 mt-4 p-4 bg-muted/30 rounded-lg border">
             <div className="flex items-start space-x-3">
               <Checkbox

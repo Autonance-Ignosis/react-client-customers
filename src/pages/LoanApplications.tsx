@@ -21,6 +21,7 @@ import {
 import { FileText, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface LoanApplication {
   id: number;
@@ -48,6 +49,7 @@ interface LoanApplication {
   timesLateIn2Years: number;
   derogatoryPublicRecords: number;
   defaultRiskProbability: number;
+  isMandateApply: boolean;
 }
 
 const LoanApplicationsPage = () => {
@@ -73,17 +75,24 @@ const LoanApplicationsPage = () => {
         const data = await response.json();
         const apps = Array.isArray(data) ? data : [data];
 
+        console.log("Loan Applications:", apps);
+
         // Check mandate existence for each loan and attach result to each app
         const appsWithMandateStatus = await Promise.all(
           apps.map(async (loan: any) => {
             try {
-              const res = await fetch(
+              const { data } = await axios.get(
                 `http://localhost:8080/api/mandates/loan/${loan.id}`
               );
-              loan.isMandateApply = res.ok; // true if mandate exists, false otherwise
+              console.log("loan id is " + loan.id, data);
+              // console.log(res);
+              if (data.length == 0) loan.isMandateApply = false;
+              // true if mandate exists, false otherwise\
+              else loan.isMandateApply = true;
             } catch {
               loan.isMandateApply = false;
             }
+            // console.log("loan id is " + loan.id, loan.isMandateApply);
             return loan;
           })
         );
@@ -285,18 +294,28 @@ const LoanApplicationsPage = () => {
                       </TableCell>
 
                       <TableCell className="text-right">
-                        {application.isMandateApply ? (
+                        {/* <p>{application.status} </p> */}
+                        {application.isMandateApply &&
+                        application.status === "APPROVED" ? (
                           <p className="text-green-600 font-medium mt-2">
                             Already Applied
                           </p>
-                        ) : (
+                        ) : application.status === "PENDING" ? (
+                          <p className="text-yellow-600 font-medium mt-2">
+                            Please wait for approval
+                          </p>
+                        ) : application.status === "REJECTED" ? (
+                          <p className="text-red-600 font-medium mt-2">
+                            Mandate can't be applied
+                          </p>
+                        ) : application.status === "APPROVED" ? (
                           <button
                             className="bg-blue-600 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700 transition"
                             onClick={() => ApplyMandent(application.id)} // your function here
                           >
                             Apply Mandate
                           </button>
-                        )}
+                        ) : null}
                       </TableCell>
                     </TableRow>
                   ))}
