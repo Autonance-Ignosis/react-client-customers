@@ -1,0 +1,36 @@
+[
+    {
+      "id": "1",
+      "name": "Main Checking",
+      "balance": 4250.65,
+      "type": "checking",
+      "color": "#3b82f6",
+      "users_id":[1,2,3]
+      
+    },
+    {
+      "id": "2",
+      "name": "Savings",
+      "balance": 12750.42,
+      "type": "savings",
+      "color": "#10b981",
+      "users_id":[1,4,5]
+    },
+    {
+      "id": "3",
+      "name": "Credit Card",
+      "balance": -1540.3,
+      "type": "credit",
+      "color": "#ef4444",
+      "users_id":[2,3,4]
+    },
+    {
+      "id": "4",
+      "name": "Business Account",
+      "balance": 8250.75,
+      "type": "business",
+      "color": "#8b5cf6",
+      "users_id":[3,4,5,6]
+    }
+  ]
+  

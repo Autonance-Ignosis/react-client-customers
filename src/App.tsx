@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import LoanOffers from "./pages/LoanOffers";
 import LoanApplicationsPage from "./pages/LoanApplications";
 import MandateApplication from "./pages/MandateApplication";
+import LandingPage from "./pages/LandingPage";
 import Transactions from "./pages/Transactions";
 
 const queryClient = new QueryClient();
@@ -113,17 +114,18 @@ const App = () => {
               {/* Public Routes */}
               <Route
                 path="/login"
-                element={user ? <Navigate to="/" replace /> : <AuthPage />}
+                element={user ? <Navigate to="/home" replace /> : <AuthPage />}
               />
+
+              <Route path="/" element={<LandingPage />} />
 
               {/* Main Layout Routes */}
               <Route path="/" element={<MainLayout />}>
-                {/* Home is accessible to all */}
-                <Route index element={<HomePage />} />
+                {/* HomePage moved to /home */}
+                <Route path="home" element={<HomePage />} />
 
-                {/* KYC Upload - Only for authenticated users who need to complete KYC */}
                 <Route
-                  path="/kyc"
+                  path="kyc"
                   element={
                     <RequireAuth>
                       <KycUpload />
@@ -131,9 +133,8 @@ const App = () => {
                   }
                 />
 
-                {/* Routes requiring both authentication and KYC verification */}
                 <Route
-                  path="/dashboard"
+                  path="dashboard"
                   element={
                     <RequireKyc>
                       <Dashboard />
@@ -142,7 +143,7 @@ const App = () => {
                 />
 
                 <Route
-                  path="/loans"
+                  path="loans"
                   element={
                     <RequireKyc>
                       <LoanOffers />
@@ -151,7 +152,7 @@ const App = () => {
                 />
 
                 <Route
-                  path="/loans/apply/:loanId"
+                  path="loans/apply/:loanId"
                   element={
                     <RequireKyc>
                       <LoanApplication />
@@ -160,7 +161,7 @@ const App = () => {
                 />
 
                 <Route
-                  path="/loans/applications"
+                  path="loans/applications"
                   element={
                     <RequireKyc>
                       <LoanApplicationsPage />
@@ -169,7 +170,7 @@ const App = () => {
                 />
 
                 <Route
-                  path="/mandate/:id"
+                  path="mandate/:id"
                   element={
                     <RequireKyc>
                       <MandateSetup />
@@ -178,10 +179,19 @@ const App = () => {
                 />
 
                 <Route
-                  path="/mandate/apply/:bankId/:loanId"
+                  path="mandate/apply/:bankId/:loanId"
                   element={
                     <RequireKyc>
                       <MandateApplication />
+                    </RequireKyc>
+                  }
+                />
+
+                <Route
+                  path="notifications"
+                  element={
+                    <RequireKyc>
+                      <NotificationsPage />
                     </RequireKyc>
                   }
                 />

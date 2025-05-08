@@ -32,6 +32,13 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+import accountsData from "../store/accounts.json";
+import transactionsData from "../store/transactions.json";
+import { useSelector } from "react-redux";
+
+console.log(accountsData);
+console.log(transactionsData);
+
 // Types
 interface Transaction {
   id: string;
@@ -61,86 +68,18 @@ const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<string>("all");
   const [chartData, setChartData] = useState<ChartData[]>([]);
+  const { user } = useSelector((state: any) => state.user) || {};
 
-  // Mock data - In a real app, this would come from an API
   useEffect(() => {
-    // Sample accounts
-    const mockAccounts: Account[] = [
-      {
-        id: "1",
-        name: "Main Checking",
-        balance: 4250.65,
-        type: "checking",
-        color: "#3b82f6",
-      },
-      {
-        id: "2",
-        name: "Savings",
-        balance: 12750.42,
-        type: "savings",
-        color: "#10b981",
-      },
-      {
-        id: "3",
-        name: "Credit Card",
-        balance: -1540.3,
-        type: "credit",
-        color: "#ef4444",
-      },
-    ];
+    if (!user?.id) return;
 
-    // Sample transactions for the last 7 days
-    const today = new Date();
-    const mockTransactions: Transaction[] = [];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split("T")[0];
-
-      // Add random transactions for each day
-      mockAccounts.forEach((account) => {
-        // Add 1-3 transactions per account per day
-        const transactionsCount = Math.floor(Math.random() * 3) + 1;
-
-        for (let j = 0; j < transactionsCount; j++) {
-          const isExpense = Math.random() > 0.3; // 70% chance of expense
-          const amount = isExpense
-            ? -(Math.random() * 200 + 10).toFixed(2)
-            : (Math.random() * 500 + 100).toFixed(2);
-
-          mockTransactions.push({
-            id: `${dateStr}-${account.id}-${j}`,
-            date: dateStr,
-            amount: parseFloat(amount),
-            type: isExpense ? "expense" : "income",
-            description: isExpense
-              ? [
-                  "Grocery Store",
-                  "Restaurant",
-                  "Online Shopping",
-                  "Utilities",
-                  "Transport",
-                ][Math.floor(Math.random() * 5)]
-              : ["Salary", "Refund", "Investment", "Gift", "Side Income"][
-                  Math.floor(Math.random() * 5)
-                ],
-            category: isExpense
-              ? ["Food", "Entertainment", "Bills", "Shopping", "Transport"][
-                  Math.floor(Math.random() * 5)
-                ]
-              : ["Income", "Investments", "Transfers", "Other"][
-                  Math.floor(Math.random() * 4)
-                ],
-            accountId: account.id,
-          });
-        }
-      });
-    }
-
-    setAccounts(mockAccounts);
-    setTransactions(mockTransactions);
-  }, []);
+    // Filter accounts that belong to the logged-in user
+    const userAccounts = accountsData.filter((account) =>
+      account.users_id.includes(user.id)
+    );
+    setAccounts(userAccounts);
+    setTransactions(transactionsData);
+  }, [user]);
 
   // Prepare chart data
   useEffect(() => {
