@@ -101,8 +101,8 @@ export function Sidebar({ className }: SidebarProps) {
               ? "-translate-x-full"
               : "w-16"
             : isMobile
-            ? "w-64"
-            : "w-64",
+              ? "w-64"
+              : "w-64",
           isMobile ? "lg:translate-x-0" : "",
           className
         )}
@@ -136,23 +136,22 @@ export function Sidebar({ className }: SidebarProps) {
             </nav>
           </div>
 
-          <div className="mt-auto p-4 border-t border-border">
-            {/* Always show AI Assistant regardless of user status */}
-            <Button
-              variant="ghost"
+          {/* <div className="mt-auto p-4 border-t border-border">
+            <Link
+              to="/assistant"
               className={cn(
-                "w-full text-left text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30",
-                collapsed && !isMobile ? "justify-center" : "justify-start"
+                "flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors",
+                location.pathname === "/assistant" && "bg-muted font-medium",
+                collapsed && !isMobile ? "justify-center" : ""
               )}
             >
+
               <MessageSquare className="w-5 h-5" />
               {!collapsed || isMobile ? (
                 <span className="ml-2">AI Assistant</span>
               ) : null}
-            </Button>
+            </Link>
           </div>
-
-          {/* Collapse/Expand Button (only visible on desktop) */}
           <Button
             variant="ghost"
             size="icon"
@@ -165,9 +164,9 @@ export function Sidebar({ className }: SidebarProps) {
                 collapsed ? "rotate-180" : ""
               )}
             />
-          </Button>
+          </Button> */}
         </div>
-      </aside>
+      </aside >
     </>
   );
 }

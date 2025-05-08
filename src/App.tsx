@@ -26,6 +26,7 @@ import LoanApplicationsPage from "./pages/LoanApplications";
 import MandateApplication from "./pages/MandateApplication";
 import LandingPage from "./pages/LandingPage";
 import Transactions from "./pages/Transactions";
+import { AIAssistant } from "./pages/AIAssistant";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +109,8 @@ const App = () => {
       <ThemeProvider defaultTheme="system">
         <TooltipProvider>
           <Toaster />
+          <AIAssistant />
+
           <Sonner position="top-right" />
           <BrowserRouter>
             <Routes>
@@ -222,6 +225,15 @@ const App = () => {
                     </RequireKyc>
                   }
                 />
+
+                {/* <Route
+                  path="/assistant"
+                  element={
+                    <RequireKyc>
+                      <AIAssistant />
+                    </RequireKyc>
+                  }
+                /> */}
               </Route>
 
               {/* Catch-all route */}
