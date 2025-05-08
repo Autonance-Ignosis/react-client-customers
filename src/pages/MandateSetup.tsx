@@ -21,8 +21,8 @@ export default function MandateSetup() {
   const { user } = useSelector((state: any) => state.user) || {};
   console.log("User from Redux:", user);
 
-  const [selectedBank, setSelectedBank] = useState<string | null>(null);
-  const [selectedBankName, setSelectedBankName] = useState<string | null>(null);
+  // const [selectedBank, setSelectedBank] = useState<string | null>(null);
+  // const [selectedBankName, setSelectedBankName] = useState<string | null>(null);
 
   const [bankId, setBankId] = useState<string[]>([]);
 
@@ -30,14 +30,18 @@ export default function MandateSetup() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [selectedBankAccount, setSelectedBankAccount] = useState<string | null>(null);
+
   useEffect(() => {
     axios
       .get(`http://localhost:8080/api/bank-accounts/user/${user?.id}`)
       .then((res) => {
-        console.log("Banks:", res.data[0].bankId, res.data.length);
-        const ids = res.data.map((item: any) => item.bankId);
-        setBankId(ids); // This will trigger the second effect when bankId changes
-        console.log("Bank IDs:", ids);
+        console.log("Banks Accounts:", res.data[0].bankId, res.data.length);
+        // const ids = res.data.map((item: any) => item.bankId);
+        // setBankId(ids); // This will trigger the second effect when bankId changes
+        // console.log("Bank IDs:", ids);
+        setBankAccounts(res.data);
       })
       .catch((err) => {
         console.error("Failed to fetch banks:", err);
@@ -46,33 +50,33 @@ export default function MandateSetup() {
       .finally(() => setIsLoading(false));
   }, [user?.id]);
 
-  useEffect(() => {
-    if (bankId.length > 0) {
-      console.log("Fetching banks with IDs:", bankId);
-      axios
-        .post("http://localhost:8080/api/banks/by-ids", bankId)
-        .then((res) => {
-          console.log("List of Banks:", res.data);
-          setBanks(res.data);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch banks:", err);
-          toast.error("Unable to load banks");
-        })
-        .finally(() => setIsLoading(false));
-    }
-  }, [bankId]);
+  // useEffect(() => {
+  //   if (bankId.length > 0) {
+  //     console.log("Fetching banks with IDs:", bankId);
+  //     axios
+  //       .post("http://localhost:8080/api/banks/by-ids", bankId)
+  //       .then((res) => {
+  //         console.log("List of Banks:", res.data);
+  //         setBanks(res.data);
+  //       })
+  //       .catch((err) => {
+  //         console.error("Failed to fetch banks:", err);
+  //         toast.error("Unable to load banks");
+  //       })
+  //       .finally(() => setIsLoading(false));
+  //   }
+  // }, [bankId]);
 
-  const handleBankSelect = (bankId: string) => {
-    setSelectedBank(bankId);
+  const handleBankSelect = (bankAccountId: string) => {
+    setSelectedBankAccount(bankAccountId);
   };
 
   const handleNext = () => {
-    if (!selectedBank) {
-      toast.error("Please select a bank to continue");
+    if (!selectedBankAccount) {
+      toast.error("Please select a bank account to continue");
       return;
     }
-    navigate(`/mandate/apply/${selectedBank}/${id}`);
+    navigate(`/mandate/apply/${selectedBankAccount}/${id}`);
   };
 
   return (
@@ -86,13 +90,13 @@ export default function MandateSetup() {
 
       <BankSelectionCard
         onSelect={handleBankSelect}
-        selectedBank={selectedBank}
-        banks={banks}
+        selectedBankAccount={selectedBankAccount}
+        bankAccounts={bankAccounts}
         isLoading={isLoading}
       />
 
       <div className="flex justify-end">
-        <Button onClick={handleNext} disabled={!selectedBank}>
+        <Button onClick={handleNext} disabled={!selectedBankAccount}>
           Continue
         </Button>
       </div>

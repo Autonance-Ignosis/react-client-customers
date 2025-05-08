@@ -179,7 +179,7 @@ const App = () => {
                 />
 
                 <Route
-                  path="mandate/apply/:bankId/:loanId"
+                  path="mandate/apply/:bankAccountId/:loanId"
                   element={
                     <RequireKyc>
                       <MandateApplication />

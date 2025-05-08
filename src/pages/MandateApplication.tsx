@@ -4,16 +4,16 @@ import { useParams } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 export default function MandateApplication() {
-  const { bankId } = useParams<{ bankId: string }>();
+  const { bankAccountId } = useParams<{ bankAccountId: string }>();
   const { loanId } = useParams<{ loanId: string }>();
 
-  console.log(bankId);
+  console.log(bankAccountId);
 
-  if (!bankId?.trim()) {
+  if (!bankAccountId?.trim()) {
     return <div className="text-red-500">Valid Bank ID is required</div>;
   }
 
-  const selectedBankDetails = mockBanks.find((bank) => bank.id === bankId);
+  // const selectedBankDetails = mockBanks.find((bank) => bank.id === bankId);
 
   const loanAmount = 110000;
   const emi = 10000;
@@ -29,7 +29,7 @@ export default function MandateApplication() {
   return (
     <div className="space-y-6">
       <MandateApplicationForm
-        bankId={bankId}
+        bankAccountId={bankAccountId}
         loanAmount={loanAmount}
         emi={emi}
         loanId={loanId}

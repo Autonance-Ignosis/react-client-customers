@@ -21,7 +21,7 @@ import { Mandate } from "@/types/Mandate";
 import { useNavigate } from "react-router-dom";
 
 interface MandateApplicationFormProps {
-  bankId: string;
+  bankAccountId: string;
   loanAmount: number;
   emi: number;
   loanId: string;
@@ -73,7 +73,7 @@ const steps = [
 ];
 
 export default function MandateApplicationForm({
-  bankId,
+  bankAccountId,
   emi,
   loanId,
   // onConfirm,
@@ -168,27 +168,26 @@ export default function MandateApplicationForm({
     if (user && user.user && user.user.id) {
       axios
         .get(
-          `http://localhost:8080/api/bank-accounts/${bankId}/${user.user.id}`
+          `http://localhost:8080/api/bank-accounts/${bankAccountId}`
         )
         .then((res) => {
-          if (res.data && res.data.length > 0) {
+          if (res.data) {
             setFormData((prev) => ({
               ...prev,
-              creditAccountNo: res.data[0].accountNo || "",
+              creditAccountNo: res.data.accountNo || "",
               mobileNo: user.user.phone || "",
               emailId: user.user.email || "",
             }));
             console.log("Fetched bank account:", res.data);
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to fetch bank account:", err);
-          toast.error("Failed to load bank account details");
-        });
 
-      // Fetch bank details
-      axios
-        .get(`http://localhost:8080/api/banks/id/${bankId}`)
+            // After fetching account details, fetch bank details using the bank ID from account
+            if (res.data.bankId) {
+              return axios.get(`http://localhost:8080/api/banks/id/${res.data.bankId}`);
+            }
+            return Promise.reject("No bankId in account data");
+          }
+          return Promise.reject("No account data received");
+        })
         .then((res) => {
           console.log("Fetched bank:", res.data);
           if (res.data) {
@@ -200,14 +199,14 @@ export default function MandateApplicationForm({
           }
         })
         .catch((err) => {
-          console.error("Failed to fetch bank:", err);
-          toast.error("Failed to load bank details");
+          console.error("Failed to fetch bank details:", err);
+          toast.error("Failed to load bank account or bank details");
         })
         .finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
     }
-  }, [bankId, user]);
+  }, [bankAccountId, user]);
 
   useEffect(() => {
     // Update form data when start date changes
@@ -301,7 +300,7 @@ export default function MandateApplicationForm({
     const mandatePayload: Mandate = {
       loanId: loanId,
       userId: user.user.id,
-      bankAccountId: bankId,
+      bankAccountId: bankAccountId,
       mandateVariant: formData.mandateVariant,
       category: formData.category,
       debitType: formData.debitType,
@@ -325,6 +324,7 @@ export default function MandateApplicationForm({
       console.log("Mandate submitted:", response.data);
       toast.success("Mandate application submitted successfully");
       // onConfirm();
+      navigate("/dashboard");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error(

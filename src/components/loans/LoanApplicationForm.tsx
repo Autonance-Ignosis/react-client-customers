@@ -159,7 +159,7 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
       handleSubmit();
-      navigate("/dashboard");
+      // navigate("/dashboard");
     }
   };
 
@@ -510,8 +510,8 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             <p>Amount: &#8377;{formData.amount.toLocaleString()}</p>
             <p>
               Purpose:{" "}
-              {formData.purpose.charAt(0).toUpperCase() +
-                formData.purpose.slice(1)}
+              {formData.purpose?.charAt(0).toUpperCase() +
+                formData.purpose?.slice(1)}
             </p>
             <p>Tenure: {formData.tenureInMonths} months</p>
             <p>Interest Rate: {formData.interestRate}%</p>
@@ -567,7 +567,8 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
       case 4:
         return renderReviewStep();
       default:
-        return handleSubmit();
+        handleSubmit();
+        return null;
     }
   };
 
@@ -595,8 +596,8 @@ export function LoanApplicationForm({ loanId }: { loanId?: number }) {
             {isLoading
               ? "Processing..."
               : currentStepIndex === steps.length - 1
-              ? "Submit Application"
-              : "Continue"}
+                ? "Submit Application"
+                : "Continue"}
           </Button>
         </div>
       </GlassCard>
