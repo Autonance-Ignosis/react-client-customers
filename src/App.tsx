@@ -27,6 +27,7 @@ import MandateApplication from "./pages/MandateApplication";
 import LandingPage from "./pages/LandingPage";
 import Transactions from "./pages/Transactions";
 import { AIAssistant } from "./pages/AIAssistant";
+import LoanDetailsPage from "./pages/LoanDetails";
 
 const queryClient = new QueryClient();
 
@@ -190,6 +191,16 @@ const App = () => {
                   }
                 />
 
+                <Route 
+                  path="loan/details/:loanId"
+                  element={
+                    <RequireKyc>
+                      <LoanDetailsPage />
+                    </RequireKyc>
+                  }
+                />
+                
+
                 <Route
                   path="notifications"
                   element={
@@ -225,6 +236,8 @@ const App = () => {
                     </RequireKyc>
                   }
                 />
+
+                
 
                 {/* <Route
                   path="/assistant"

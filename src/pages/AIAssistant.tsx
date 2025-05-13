@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff, X } from 'lucide-react';
+import { Send, Mic, MicOff, X, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -147,7 +147,7 @@ export function AIAssistant() {
                     onClick={toggleAssistant}
                     className="rounded-full h-12 w-12 shadow-lg"
                 >
-                    <svg
+                    {/* <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
                         height="24"
@@ -161,7 +161,8 @@ export function AIAssistant() {
                     >
                         <path d="M12 3a5 5 0 0 0-5 5v9a5 5 0 0 0 10 0V8a5 5 0 0 0-5-5z"></path>
                         <path d="M3 11.5v1a9 9 0 0 0 18 0v-1"></path>
-                    </svg>
+                    </svg> */}
+                    <MessageCircle />
                 </Button>
             )}
         </div>

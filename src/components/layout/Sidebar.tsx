@@ -114,7 +114,7 @@ export function Sidebar({ className }: SidebarProps) {
                 A
               </div>
               {!collapsed || isMobile ? (
-                <h1 className="text-xl font-bold">MandateFlow</h1>
+                <h1 className="text-xl font-bold">Autonance</h1>
               ) : null}
             </div>
 

@@ -181,8 +181,8 @@ const LoanApplicationsPage = () => {
     }
   };
 
-  const applyMandate = (id: number) => {
-    navigate(`/mandate/${id}`);
+  const loanDetails = (id: number) => {
+    navigate(`/loan/details/${id}`);
   };
 
   if (loading) {
@@ -287,23 +287,13 @@ const LoanApplicationsPage = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/10 pt-3">
-                  {application.status === "APPROVED" && !application.mandateStatus && (
-                    <Button
-                      onClick={() => applyMandate(application.id)}
-                      className="w-full"
-                    >
-                      Apply Mandate
-                    </Button>
-                  )}
-                  {(application.status !== "APPROVED" || application.mandateStatus) && (
-                    <Button
-                      variant="outline"
-                      onClick={() => applyMandate(application.id)}
-                      className="w-full"
-                    >
-                      View Details
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={() => loanDetails(application.id)}
+                    className="w-full"
+                  >
+                    View Details
+                  </Button>
                 </CardFooter>
               </Card>
             ))}
@@ -346,38 +336,13 @@ const LoanApplicationsPage = () => {
                         {(application.defaultRiskProbability * 100).toFixed(2)}%
                       </TableCell>
                       <TableCell className="text-right">
-                        {application.status === "APPROVED" && !application.mandateStatus ? (
-                          <Button
-                            onClick={() => applyMandate(application.id)}
-                            size="sm"
-                          >
-                            Apply Mandate
-                          </Button>
-                        ) : application.status === "PENDING" ? (
-                          <p className="text-yellow-600 font-medium text-sm">
-                            Awaiting approval
-                          </p>
-                        ) : application.status === "REJECTED" ? (
-                          <p className="text-red-600 font-medium text-sm">
-                            Not eligible
-                          </p>
-                        ) : application.mandateStatus ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => applyMandate(application.id)}
-                          >
-                            View Details
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => applyMandate(application.id)}
-                          >
-                            View Details
-                          </Button>
-                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => loanDetails(application.id)}
+                        >
+                          View Details
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
