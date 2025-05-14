@@ -176,9 +176,8 @@ const Transactions: React.FC = () => {
         {accounts.map((account) => (
           <Card
             key={account.id}
-            className={`overflow-hidden ${
-              selectedAccount === account.id ? "ring-2 ring-primary" : ""
-            }`}
+            className={`overflow-hidden ${selectedAccount === account.id ? "ring-2 ring-primary" : ""
+              }`}
           >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -189,7 +188,7 @@ const Transactions: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                $
+                <span>&#8377;</span>
                 {Math.abs(account.balance).toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -217,16 +216,14 @@ const Transactions: React.FC = () => {
               <CardTitle>
                 {selectedAccount === "all"
                   ? "Spending Trends (Last 7 Days)"
-                  : `${
-                      accounts.find((a) => a.id === selectedAccount)?.name
-                    } Spending (Last 7 Days)`}
+                  : `${accounts.find((a) => a.id === selectedAccount)?.name
+                  } Spending (Last 7 Days)`}
               </CardTitle>
               <CardDescription>
                 {selectedAccount === "all"
                   ? "Daily expenses across your accounts"
-                  : `Daily expenses for ${
-                      accounts.find((a) => a.id === selectedAccount)?.name
-                    }`}
+                  : `Daily expenses for ${accounts.find((a) => a.id === selectedAccount)?.name
+                  }`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -268,9 +265,8 @@ const Transactions: React.FC = () => {
                 <AlertDescription>
                   {selectedAccount === "all"
                     ? "This chart shows your daily expenses across all accounts for the past week."
-                    : `This chart shows your daily expenses for the ${
-                        accounts.find((a) => a.id === selectedAccount)?.name
-                      } account for the past week.`}
+                    : `This chart shows your daily expenses for the ${accounts.find((a) => a.id === selectedAccount)?.name
+                    } account for the past week.`}
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -285,9 +281,8 @@ const Transactions: React.FC = () => {
               <CardDescription>
                 {selectedAccount === "all"
                   ? "Showing transactions from all accounts"
-                  : `Showing transactions from ${
-                      accounts.find((a) => a.id === selectedAccount)?.name || ""
-                    }`}
+                  : `Showing transactions from ${accounts.find((a) => a.id === selectedAccount)?.name || ""
+                  }`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -330,13 +325,13 @@ const Transactions: React.FC = () => {
                           </div>
                         </div>
                         <div
-                          className={`font-bold ${
-                            transaction.type === "income"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
+                          className={`font-bold ${transaction.type === "income"
+                            ? "text-green-600"
+                            : "text-red-600"
+                            }`}
                         >
-                          {transaction.type === "income" ? "+" : "-"}$
+                          {transaction.type === "income" ? "+" : "-"}
+                          <span>&#8377;</span>
                           {Math.abs(transaction.amount).toFixed(2)}
                         </div>
                       </div>
