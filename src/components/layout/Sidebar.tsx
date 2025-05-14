@@ -57,8 +57,8 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "My Applications", path: "/loans/applications", icon: FileClock },
     { name: "KYC Verification", path: "/kyc", icon: Upload },
     { name: "Your Transactions", path: "/Transactions", icon: CreditCard },
-    { name: "Notifications", path: "/notifications", icon: Bell },
-    { name: "Settings", path: "/settings", icon: Settings },
+    // { name: "Notifications", path: "/notifications", icon: Bell },
+    // { name: "Settings", path: "/settings", icon: Settings },
   ];
 
   // Filter navigation items based on user state and KYC verification
